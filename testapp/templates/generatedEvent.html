@@ -1,0 +1,21 @@
+
+<div class="container" id="{{ event.url }}cont">
+
+  <div>
+    <h4 id="{{ event.url }}title">{{ event.title }}</h4>
+    <h6 id={{ event.url }}></h6>
+    <script type="text/javascript">
+      timeCounter("{{ event.url }}", "{{event.finish_date|date:'M j, o H:i:s'}}");
+    </script>
+    <button type="button" id="{{ event.url }}btn" onclick='showOptions("{{ event.url }}")' class="btn btn-secondary">Edit</button>
+  </div>
+
+  <div class="container" id="{{ event.url }}div" style="display: none;">
+
+    <!-- <button type="button" class="btn btn-dark">Cancel</button> -->
+    <button type="button" class="btn btn-success" onclick='startEdit("{{ event.url }}")'>Edit</button>
+    <button type="button" class="btn btn-danger" onclick='deleteEvent("{{ event.url }}")'>Delete</button>
+
+  </div>
+
+</div>

@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<h3>Hi {{ fname }} {{ sname }}, here are your tasks</h3>
+
+
+<button type="button" class="btn btn-secondary" onclick="generateEventForm()" style="width: 100px;" id="addEventBtn">Add event</button>
+
+<div class="container-md" id="eventForm" style="display: none; position:absolute; margin-left: 20px; margin-top: 20px;">
+
+  <form>
+    <div class="form-group">
+      <label for="eventTitle">Event title</label>
+      <input type="text" class="form-control" id="eventTitle">
+    </div>
+    <div class="form-group">
+      <label for="eventDate">Event date</label>
+      <input type="date" class="form-control" id="eventDate">
+    </div>
+    <div class="form-group">
+      <label for="eventTime">Event time</label>
+      <input type="time" class="form-control" id="eventTime">
+    </div>
+  </form>
+  <button class="btn btn-primary" onclick="addEvent()">Add</button>
+
+    <div class="alert alert-danger" role="alert" id="formAlert" style="display: none;">
+    </div>
+  </div>
+
+
+
+
+<div class="" style="margin-left: 30%; display: block;">
+
+  <div class="periodOptions" style="display:inline;">
+    <button type="button" class="btn btn-success" onclick="setPeriod(4)">All</button>
+    <button type="button" class="btn btn-info" onclick="setPeriod(1)">Daily</button>
+    <button type="button" class="btn btn-info" onclick="setPeriod(2)">Weekly</button>
+    <button type="button" class="btn btn-info" onclick="setPeriod(3)">Monthly</button>
+
+  </div>
+
+  <div class="findEvent" style="display: inline;">
+
+    <input type="text" name="" value="" id="findInput">
+    <button type="button" class="btn btn-dark" onclick="findEvent()">Find</button>
+
+  </div>
+
+</div>
+
+
+  <div class="container" id="userEvents">
+
+
+
+    {% for event in events  %}
+
+    <div class="container" style="width:59%" id="{{ event.url }}cont">
+
+      <div>
+        <h4 id="{{ event.url }}title">{{ event.title }}</h4>
+        <h6 id={{ event.url }}>{{event.finish_date|date:'M j, o H:i:s'}}</h6>
+        <script type="text/javascript">
+          timeCounter("{{ event.url }}", "{{event.finish_date|date:'M j, o H:i:s'}}");
+        </script>
+        <button type="button" id="{{ event.url }}btn"  style="width: 100px;" onclick='showOptions("{{ event.url }}")' class="btn btn-secondary">Config</button>
+        <div class="container" id="{{ event.url }}div" style="display: none;">
+
+          <button type="button" class="btn btn-success"  style="width: 100px;" onclick='startEdit("{{ event.url }}")'>Edit</button>
+          <button type="button" class="btn btn-danger"  style="width: 100px;" onclick='deleteEvent("{{ event.url }}")'>Delete</button>
+
+        </div>
+
+
+      </div>
+
+    </div>
+
+    <div id="{{ event.url }}updform" style="display:none">
+      <form>
+        <div class="form-group">
+          <label for="eventTitle">New event title</label>
+          <input type="text" class="form-control" id="{{ event.url }}newEventTitle" value="{{event.title}}">
+        </div>
+        <div class="form-group">
+          <label for="eventDate">New event date</label>
+          <input type="date" class="form-control" id="{{ event.url }}newEventDate" value="{{event.finish_date|date:'o-m-d'}}">
+        </div>
+        <div class="form-group">
+          <label for="eventTime">New event time</label>
+          <input type="time" class="form-control" id="{{ event.url }}newEventTime" value="{{event.finish_date|date:'H:i'}}">
+        </div>
+      </form>
+
+      <button type="button" class="btn btn-success" onclick='saveUpdated("{{ event.url }}")'>Save</button>
+      <button type="button" class="btn btn-danger" onclick='startEdit("{{ event.url }}")'>Cancel</button>
+      <div class="alert alert-danger" role="alert" id="{{ event.url }}formAlert" style="display: none;">
+      </div>
+    </div>
+
+
+
+    {% endfor %}
+
+    {% for event in events_completed  %}
+
+    <div class="container">
+      <h4>{{ event.title }} <span class="badge badge-danger">COMPLETED</span></h4>
+      <h6>{{event.finish_date|date:'M j, o H:i:s'}}</h6>
+    </div>
+
+    <div class="container">
+
+      <button type="button" class="btn btn-danger" onclick='deleteEvent("{{ event.url }}")'>Delete</button>
+
+    </div>
+
+
+
+    {% endfor %}
+
+
+
+  </div>
+
+  <script type="text/javascript">
+
+    function startEdit(elementUrl) {
+      if ($("#"+elementUrl+"updform").css("display") == "none") {
+        $("#"+elementUrl+"updform").show();
+        $("#"+elementUrl+"cont").hide();
+      } else {
+        $("#"+elementUrl+"updform").hide();
+        $("#"+elementUrl+"cont").show();
+      }
+    }
+
+    function showOptions(elementUrl) {
+      if ($("#"+elementUrl+"div").css("display") == "none") {
+        $("#"+elementUrl+"div").show();
+        $("#"+elementUrl+"btn").text("Cancel")
+      } else {
+        $("#"+elementUrl+"div").hide();
+        $("#"+elementUrl+"btn").text("Config")
+      }
+    }
+
+    function deleteEvent(elementUrl) {
+
+      $.ajax({
+        url: "/ajax/deleteEvent",
+        data: ({ event_url: elementUrl }),
+        type: "GET",
+        success: function(data) {
+          if (data.resp == true) {
+            $("#" + elementUrl + "cont").remove();
+          }
+
+        },
+        error: function(error) {
+          console.log(error);
+        },
+
+      });
+    }
+
+    function saveUpdated(elementUrl) {
+      $newTitle = $("#" + elementUrl + "newEventTitle").val();
+      $newDate = $("#" + elementUrl + "newEventDate").val();
+      $newTime =  $("#" + elementUrl + "newEventTime").val();
+      console.log($newDate, $newTime, $newTitle, elementUrl);
+      $.ajax({
+        url: "/ajax/updateEvent",
+        data: ({ title : $newTitle, date: $newDate, time: $newTime, event_url: elementUrl }),
+        type: "GET",
+        success: function(data) {
+          if (data.resp == true) {
+            $("#" + elementUrl + "title").text($newTitle);
+            var date = $newDate + "T" + $newTime;
+            timeCounter(elementUrl, date);
+            console.log(date);
+            startEdit(elementUrl);
+          }
+
+        },
+        error: function(error) {
+          console.log(error);
+        },
+
+      });
+    }
+
+  </script>
+
+
+
+{% endblock %}

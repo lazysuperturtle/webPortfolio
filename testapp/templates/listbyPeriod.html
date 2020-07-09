@@ -1,0 +1,64 @@
+{% for event in events  %}
+
+<div class="container" id="{{ event.url }}cont">
+
+  <div>
+    <h4 id="{{ event.url }}title">{{ event.title }}</h4>
+    <h6 id={{ event.url }}>{{event.finish_date|date:'M j, o H:i:s'}}</h6>
+    <script type="text/javascript">
+      timeCounter("{{ event.url }}", "{{event.finish_date|date:'M j, o H:i:s'}}");
+    </script>
+    <button type="button" id="{{ event.url }}btn" onclick='showOptions("{{ event.url }}")' class="btn btn-secondary">Config</button>
+  </div>
+
+  <div class="container" id="{{ event.url }}div" style="display: none;">
+
+    <!-- <button type="button" class="btn btn-dark">Cancel</button> -->
+    <button type="button" class="btn btn-success" onclick='startEdit("{{ event.url }}")'>Edit</button>
+    <button type="button" class="btn btn-danger" onclick='deleteEvent("{{ event.url }}")'>Delete</button>
+
+  </div>
+
+</div>
+
+<div id="{{ event.url }}updform" style="display:none">
+  <form>
+    <div class="form-group">
+      <label for="eventTitle">New event title</label>
+      <input type="text" class="form-control" id="{{ event.url }}newEventTitle" value="{{event.title}}">
+    </div>
+    <div class="form-group">
+      <label for="eventDate">New event date</label>
+      <input type="date" class="form-control" id="{{ event.url }}newEventDate" value="{{event.finish_date|date:'o-m-d'}}">
+    </div>
+    <div class="form-group">
+      <label for="eventTime">New event time</label>
+      <input type="time" class="form-control" id="{{ event.url }}newEventTime" value="{{event.finish_date|date:'H:i'}}">
+    </div>
+  </form>
+
+  <button type="button" class="btn btn-success" onclick='saveUpdated("{{ event.url }}")'>Save</button>
+  <button type="button" class="btn btn-danger" onclick='startEdit("{{ event.url }}")'>Cancel</button>
+
+</div>
+
+
+
+{% endfor %}
+
+{% for event in events_completed  %}
+
+<div class="container">
+  <h4>{{ event.title }} <span class="badge badge-danger">COMPLETED</span></h4>
+  <h6>{{event.finish_date|date:'M j, o H:i:s'}}</h6>
+</div>
+
+<div class="container">
+
+  <button type="button" class="btn btn-danger" onclick='deleteEvent("{{ event.url }}")'>Delete</button>
+
+</div>
+
+
+
+{% endfor %}

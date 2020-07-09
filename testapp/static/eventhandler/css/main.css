@@ -1,0 +1,12 @@
+
+#eventForm {
+  display: none;
+  position: absolute;
+}
+
+#userEvents {
+  position: absolute;
+  margin-left: 30%;
+  height: 75%;
+  overflow: scroll
+}
